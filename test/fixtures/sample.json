@@ -1,0 +1,5 @@
+{"id": 1, "name": "John Doe", "email": "john@example.com", "amount": 150.50}
+{"id": 2, "name": "Jane Smith", "email": "jane@test.org", "amount": 200.00}
+{"id": 3, "name": "Bob Wilson", "email": "bob@company.com", "amount": 75.25}
+{"id": 4, "name": "Alice Brown", "email": "alice@email.net", "amount": 300.00}
+{"id": 5, "name": "Charlie Davis", "email": "charlie@web.io", "amount": 50.00}
