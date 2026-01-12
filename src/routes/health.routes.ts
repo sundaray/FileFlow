@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import { Effect, Exit, Match } from "effect";
+import { Effect, Exit, Cause, Match } from "effect";
 import { handleHealthCheck } from "../handlers/health.handler.js";
 import type {
   HealthyResponse,
@@ -13,7 +13,8 @@ router.get("/", async (req: Request, res: Response) => {
   const exit = await Effect.runPromiseExit(handleHealthCheck());
 
   Exit.match(exit, {
-    onFailure: () => {
+    onFailure: (cause) => {
+      console.error("Health check defect: \n" + Cause.pretty(cause));
       const response: ErrorResponse = {
         status: "error",
         message: "Internal Server Error",
