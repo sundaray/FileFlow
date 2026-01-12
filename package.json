@@ -20,6 +20,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "csv-parse": "^5.5.0",
+    "effect": "^3.19.14",
     "express": "^5.2.1",
     "uuid": "^9.0.0"
   },
