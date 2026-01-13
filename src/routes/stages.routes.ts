@@ -7,7 +7,7 @@ import type {
   GetStagesError,
 } from "../schema/stages.schema.js";
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 /**
  * GET /api/stages
@@ -55,3 +55,5 @@ function isValidCategory(
     ["parser", "transform", "filter", "output"].includes(category)
   );
 }
+
+export default router;

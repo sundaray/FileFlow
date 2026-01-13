@@ -19,7 +19,7 @@ import type {
 } from "../schema/jobs.schema.js";
 import type { JobStatus } from "../types/job.types.js";
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 // ─────────────────────────────────────────────────────────────
 // GET /api/jobs
@@ -57,7 +57,7 @@ router.get("/", async (req: Request, res: Response) => {
 // GET /api/jobs/:jobId
 // ─────────────────────────────────────────────────────────────
 router.get("/:jobId", async (req: Request, res: Response) => {
-  const { jobId } = req.params;
+  const jobId = req.params.jobId as string;
 
   const exit = await Effect.runPromiseExit(
     handleGetJob({ jobId }).pipe(Effect.provide(JobStore.Default))
@@ -118,7 +118,7 @@ router.get("/:jobId", async (req: Request, res: Response) => {
 // DELETE /api/jobs/:jobId
 // ─────────────────────────────────────────────────────────────
 router.delete("/:jobId", async (req: Request, res: Response) => {
-  const { jobId } = req.params;
+  const jobId = req.params.jobId as string;
 
   const exit = await Effect.runPromiseExit(
     handleDeleteJob({ jobId }).pipe(Effect.provide(JobStore.Default))
@@ -164,7 +164,7 @@ router.delete("/:jobId", async (req: Request, res: Response) => {
 // POST /api/jobs/:jobId/cancel
 // ─────────────────────────────────────────────────────────────
 router.post("/:jobId/cancel", async (req: Request, res: Response) => {
-  const { jobId } = req.params;
+  const jobId = req.params.jobId as string;
 
   const exit = await Effect.runPromiseExit(
     handleCancelJob({ jobId }).pipe(Effect.provide(JobStore.Default))
@@ -197,10 +197,6 @@ router.post("/:jobId/cancel", async (req: Request, res: Response) => {
             status: "error",
             code: "CANNOT_CANCEL",
             message: "Job cannot be cancelled",
-            details: {
-              currentStatus: job.status,
-              reason: reason,
-            },
           };
           res.status(409).json(response);
         }),

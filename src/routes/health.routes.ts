@@ -7,7 +7,7 @@ import type {
   ErrorResponse,
 } from "../schema/health.schema.js";
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 router.get("/", async (req: Request, res: Response) => {
   const exit = await Effect.runPromiseExit(handleHealthCheck());
@@ -50,3 +50,5 @@ router.get("/", async (req: Request, res: Response) => {
     },
   });
 });
+
+export default router;
