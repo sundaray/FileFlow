@@ -18,6 +18,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@effect/platform": "^0.94.1",
+    "@effect/platform-node": "^0.104.0",
     "cors": "^2.8.5",
     "csv-parse": "^5.5.0",
     "effect": "^3.19.14",
