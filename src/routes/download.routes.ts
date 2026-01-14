@@ -14,6 +14,10 @@ import type {
   InternalServerError,
 } from "../schema/download.schema.js";
 
+// ─────────────────────────────────────────────────────────────
+// Route Factory
+// ─────────────────────────────────────────────────────────────
+
 export function createDownloadroutes(
   runtime: AppRuntime
 ): ReturnType<typeof Router> {

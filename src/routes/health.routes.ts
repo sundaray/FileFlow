@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { Effect, Exit, Cause, Match } from "effect";
+import type { AppRuntime } from "../runtime.js";
 import { handleHealthCheck } from "../handlers/health.handler.js";
 import type {
   HealthyResponse,
@@ -7,48 +8,60 @@ import type {
   ErrorResponse,
 } from "../schema/health.schema.js";
 
-const router: ReturnType<typeof Router> = Router();
+// ─────────────────────────────────────────────────────────────
+// Route Factory
+// ─────────────────────────────────────────────────────────────
 
-router.get("/", async (req: Request, res: Response) => {
-  const exit = await Effect.runPromiseExit(handleHealthCheck());
+export function createHealthRoutes(
+  runtime: AppRuntime
+): ReturnType<typeof Router> {
+  const router: ReturnType<typeof Router> = Router();
 
-  Exit.match(exit, {
-    onFailure: (cause) => {
-      console.error("Health check defect: \n" + Cause.pretty(cause));
-      const response: ErrorResponse = {
-        status: "error",
-        message: "Internal Server Error",
-      };
+  // ─────────────────────────────────────────────────────────────
+  // GET /api/health
+  // ─────────────────────────────────────────────────────────────
 
-      res.status(500).json(response);
-    },
+  router.get("/", async (req: Request, res: Response) => {
+    const exit = await Effect.runPromiseExit(handleHealthCheck());
 
-    onSuccess: ({ decision, timestamp }) => {
-      Match.value(decision).pipe(
-        Match.tag("Healthy", () => {
-          const response: HealthyResponse = {
-            status: "ok",
-            timestamp,
-          };
+    Exit.match(exit, {
+      onFailure: (cause) => {
+        console.error("Health check defect: \n" + Cause.pretty(cause));
+        const response: ErrorResponse = {
+          status: "error",
+          message: "Internal Server Error",
+        };
 
-          res.status(200).json(response);
-        }),
+        res.status(500).json(response);
+      },
 
-        Match.tag("Unhealthy", (data) => {
-          const response: UnhealthyResponse = {
-            status: "unhealthy",
-            reason: data.reason,
-            timestamp,
-          };
+      onSuccess: ({ decision, timestamp }) => {
+        Match.value(decision).pipe(
+          Match.tag("Healthy", () => {
+            const response: HealthyResponse = {
+              status: "ok",
+              timestamp,
+            };
 
-          // 503 Service Unavailable - Server is not ready to handle the request
-          return res.status(503).json(response);
-        }),
+            res.status(200).json(response);
+          }),
 
-        Match.exhaustive
-      );
-    },
+          Match.tag("Unhealthy", (data) => {
+            const response: UnhealthyResponse = {
+              status: "unhealthy",
+              reason: data.reason,
+              timestamp,
+            };
+
+            // 503 Service Unavailable - Server is not ready to handle the request
+            return res.status(503).json(response);
+          }),
+
+          Match.exhaustive
+        );
+      },
+    });
   });
-});
 
-export default router;
+  return router;
+}

@@ -13,6 +13,10 @@ import type {
 } from "../schema/progress.schema.js";
 import type { ProgressEvent } from "../types/progress.types.js";
 
+// ─────────────────────────────────────────────────────────────
+// Route Factory
+// ─────────────────────────────────────────────────────────────
+
 export function createProgressRoutes(
   runtime: AppRuntime
 ): ReturnType<typeof Router> {

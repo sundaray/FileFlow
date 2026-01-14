@@ -6,8 +6,9 @@ import { Layer, ManagedRuntime } from "effect";
 import { NodeFileSystem } from "@effect/platform-node";
 import { JobStore } from "./services/job-store.service.js";
 import { JobProgress } from "./services/job-progress.service.js";
+import { Config } from "./services/config.service.js";
 
-const BaseLayers = Layer.mergeAll(NodeFileSystem.layer);
+const BaseLayers = Layer.mergeAll(Config.Default, NodeFileSystem.layer);
 
 const StateLayers = Layer.mergeAll(JobStore.Default, JobProgress.Default);
 

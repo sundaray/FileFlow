@@ -1,4 +1,5 @@
 import { Effect, Exit, Cause } from "effect";
+import type { AppRuntime } from "../runtime.js";
 import { Router, Request, Response } from "express";
 import { handleGetStages } from "../handlers/stages.handler.js";
 import type { StageCategory } from "../rules/stages.rule.js";
@@ -7,53 +8,55 @@ import type {
   GetStagesError,
 } from "../schema/stages.schema.js";
 
-const router: ReturnType<typeof Router> = Router();
+// ─────────────────────────────────────────────────────────────
+// Route Factory
+// ─────────────────────────────────────────────────────────────
 
-/**
- * GET /api/stages
- *
- * Returns all available pipeline stage definitions.
- * Used by frontend to dynamically build the pipeline configuration UI.
- *
- * Query params:
- *   - category (optional): Filter by stage category (parser, transform, filter, output)
- */
-router.get("/", async (req: Request, res: Response) => {
-  const categoryParam = req.query.category as string | undefined;
-  const category = isValidCategory(categoryParam) ? categoryParam : undefined;
+export function createStagesRoutes(
+  runtime: AppRuntime
+): ReturnType<typeof Router> {
+  const router: ReturnType<typeof Router> = Router();
 
-  const exit = await Effect.runPromiseExit(handleGetStages({ category }));
+  // ─────────────────────────────────────────────────────────────
+  // GET /api/stages
+  // ─────────────────────────────────────────────────────────────
+  router.get("/", async (req: Request, res: Response) => {
+    const categoryParam = req.query.category as string | undefined;
+    const category = isValidCategory(categoryParam) ? categoryParam : undefined;
 
-  Exit.match(exit, {
-    onFailure: (cause) => {
-      console.error("Get stages defect: \n" + Cause.pretty(cause));
+    const exit = await Effect.runPromiseExit(handleGetStages({ category }));
 
-      const response: GetStagesError = {
-        status: "error",
-        message: "Internal server error",
-      };
+    Exit.match(exit, {
+      onFailure: (cause) => {
+        console.error("Get stages defect: \n" + Cause.pretty(cause));
 
-      res.status(500).json(response);
-    },
+        const response: GetStagesError = {
+          status: "error",
+          message: "Internal server error",
+        };
 
-    onSuccess: ({ decision }) => {
-      const response: GetStagesSuccess = {
-        status: "ok",
-        stages: decision.stages,
-      };
+        res.status(500).json(response);
+      },
 
-      res.status(200).json(response);
-    },
+      onSuccess: ({ decision }) => {
+        const response: GetStagesSuccess = {
+          status: "ok",
+          stages: decision.stages,
+        };
+
+        res.status(200).json(response);
+      },
+    });
   });
-});
 
-function isValidCategory(
-  category: string | undefined
-): category is StageCategory {
-  return (
-    category !== undefined &&
-    ["parser", "transform", "filter", "output"].includes(category)
-  );
+  function isValidCategory(
+    category: string | undefined
+  ): category is StageCategory {
+    return (
+      category !== undefined &&
+      ["parser", "transform", "filter", "output"].includes(category)
+    );
+  }
+
+  return router;
 }
-
-export default router;
