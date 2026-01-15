@@ -18,7 +18,7 @@ import type {
 // Route Factory
 // ─────────────────────────────────────────────────────────────
 
-export function createDownloadroutes(
+export function createDownloadRoutes(
   runtime: AppRuntime
 ): ReturnType<typeof Router> {
   const router = Router();

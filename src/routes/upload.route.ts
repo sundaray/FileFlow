@@ -48,7 +48,7 @@ export function createUploadRoutes(
 
   router.post("/", async (req: Request, res: Response) => {
     // 1. Extract headers
-    const filename = req.headers["x-filename"] as string | undefined;
+    const fileName = req.headers["x-filename"] as string | undefined;
     const pipelineConfigRaw = req.headers["x-pipeline-config"] as
       | string
       | undefined;
@@ -59,7 +59,7 @@ export function createUploadRoutes(
     // 2. Validate request
     const validationExit = await runtime.runPromiseExit(
       handleValidateUpload({
-        filename,
+        fileName,
         pipelineConfigRaw,
         contentLength,
       })
@@ -74,7 +74,7 @@ export function createUploadRoutes(
 
       onSuccess: ({ output }) => {
         return Match.value(output).pipe(
-          Match.tag("MissingFilename", () => {
+          Match.tag("MissingFileName", () => {
             const response: UploadMissingFilenameError = {
               status: "error",
               code: "MISSING_FILENAME",
@@ -99,7 +99,6 @@ export function createUploadRoutes(
               status: "error",
               code: "INVALID_PIPELINE_CONFIG",
               message: "Invalid pipeline configuration JSON",
-              details: error,
             };
             res.status(400).json(response);
             return null;
@@ -110,7 +109,6 @@ export function createUploadRoutes(
               status: "error",
               code: "INVALID_PIPELINE_STRUCTURE",
               message: "Invalid pipeline structure",
-              details: error,
             };
             res.status(400).json(response);
             return null;
@@ -163,7 +161,7 @@ export function createUploadRoutes(
         console.error("Upload Stream Error:\n" + Cause.pretty(cause));
         const response: UploadStreamError = {
           status: "error",
-          code: "UPLOAD_ERROR",
+          code: "UPLOAD_STREAM_ERROR",
           message: "Failed to upload file",
         };
         res.status(500).json(response);

@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────
 export interface UploadSuccess {
   status: "ok";
-  jobid: string;
+  jobId: string;
   message: string;
 }
 
@@ -25,13 +25,13 @@ export interface UploadMissingPipelineConfigError {
 
 export interface UploadInvalidPipelineConfigError {
   status: "error";
-  code: "INVLID_PIPELINE_CONFIG";
+  code: "INVALID_PIPELINE_CONFIG";
   message: string;
 }
 
 export interface UploadInvalidPipelineStructureError {
   status: "error";
-  code: "INVLID_PIPELINE_STRUCTURE";
+  code: "INVALID_PIPELINE_STRUCTURE";
   message: string;
 }
 

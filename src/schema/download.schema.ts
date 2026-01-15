@@ -38,3 +38,6 @@ export interface InternalServerError {
   readonly code: "INTERNAL_SERVER_ERROR";
   readonly message: string;
 }
+
+
+

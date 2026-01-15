@@ -24,7 +24,7 @@ import type { AppRuntime } from "../runtime.js";
 // Route Factory
 // ─────────────────────────────────────────────────────────────
 
-export function createJobRoutes(
+export function createJobsRoutes(
   runtime: AppRuntime
 ): ReturnType<typeof Router> {
   const router: ReturnType<typeof Router> = Router();
