@@ -7,12 +7,15 @@ import { NodeFileSystem } from "@effect/platform-node";
 import { JobStore } from "./services/job-store.service.js";
 import { JobProgress } from "./services/job-progress.service.js";
 import { Config } from "./services/config.service.js";
+import { PipelineProcessor } from "./services/pipeline/index.js";
 
 const BaseLayers = Layer.mergeAll(Config.Default, NodeFileSystem.layer);
 
 const StateLayers = Layer.mergeAll(JobStore.Default, JobProgress.Default);
 
-const coreLayers = Layer.mergeAll(BaseLayers, StateLayers);
+const ServiceLayers = PipelineProcessor.Default;
+
+const coreLayers = Layer.mergeAll(BaseLayers, StateLayers, ServiceLayers);
 
 export const AppLayer = Layer.mergeAll(coreLayers);
 
