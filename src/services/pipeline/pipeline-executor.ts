@@ -1,5 +1,6 @@
-import { Effect, Stream, Chunk, pipe } from "effect";
+import { Effect, Stream, pipe } from "effect";
 import { FileSystem } from "@effect/platform";
+import { createWriteStream, type WriteStream } from "node:fs";
 import {
   PipelineError,
   PipelineExecutionError,
@@ -18,11 +19,65 @@ export interface PipelineResult {
 }
 
 // ─────────────────────────────────────────────────────────────
+// File Write Helpers
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Write a single chunk to the write stream.
+ * Handles Node.js backpressure by waiting for 'drain' if needed.
+ */
+function writeChunk(
+  writeStream: WriteStream,
+  chunk: Uint8Array
+): Effect.Effect<number, Error> {
+  return Effect.async<number, Error>((resume) => {
+    const canContinue = writeStream.write(chunk, (err) => {
+      if (err) {
+        resume(Effect.fail(err));
+      } else {
+        resume(Effect.succeed(chunk.length));
+      }
+    });
+
+    // Handle backpressure - if buffer is full, Node will
+    // queue the write and call our callback when done
+    if (!canContinue) {
+      writeStream.once("drain", () => {
+        // Write already queued, callback handles completion
+      });
+    }
+  });
+}
+
+/**
+ * Open a write stream for the output file.
+ */
+function openWriteStream(
+  path: string
+): Effect.Effect<WriteStream, FileWriteError> {
+  return Effect.try({
+    try: () => createWriteStream(path),
+    catch: (cause) => new FileWriteError({ path, cause }),
+  });
+}
+
+/**
+ * Close the write stream gracefully.
+ */
+function closeWriteStream(writeStream: WriteStream): Effect.Effect<void> {
+  return Effect.async<void>((resume) => {
+    writeStream.end(() => {
+      resume(Effect.succeed(undefined));
+    });
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
 // Executor
 // ─────────────────────────────────────────────────────────────
 
 /**
- * Execute the full pipeline using Effect Streams.
+ * Execute the full pipeline using Effect Streams with TRUE streaming writes.
  *
  * Pipeline flow:
  * 1. Read file as byte stream (using @effect/platform FileSystem)
@@ -30,7 +85,9 @@ export interface PipelineResult {
  * 3. Apply object transforms (filter, uppercase, etc.)
  * 4. Convert to JSON lines
  * 5. Apply byte transforms (compression)
- * 6. Write to output file
+ * 6. Stream each chunk directly to output file (NO BUFFERING)
+ *
+ * Memory usage: O(1) - only one chunk in memory at a time
  */
 export function executePipeline<TReq>(
   inputPath: string,
@@ -94,31 +151,31 @@ export function executePipeline<TReq>(
       >;
     }
 
-    // Step 6: Collect output and write to file
-    const outputChunks = yield* Stream.runCollect(outputStream);
+    // Step 6: Stream directly to file using acquireUseRelease pattern
+    // This ensures the file handle is properly closed even on errors
+    yield* Effect.acquireUseRelease(
+      // Acquire: Open write stream
+      openWriteStream(outputPath),
 
-    // Combine all chunks into a single Uint8Array
-    const allOutput = Chunk.toReadonlyArray(outputChunks).reduce(
-      (acc, chunk) => {
-        const combined = new Uint8Array(acc.length + chunk.length);
-        combined.set(acc);
-        combined.set(chunk, acc.length);
-        return combined;
-      },
-      new Uint8Array(0)
-    );
+      // Use: Stream each chunk directly to the file
+      (writeStream) =>
+        Stream.runForEach(outputStream, (chunk) =>
+          Effect.gen(function* () {
+            const bytesWritten = yield* writeChunk(writeStream, chunk).pipe(
+              Effect.mapError(
+                (cause) =>
+                  new FileWriteError({
+                    path: outputPath,
+                    cause,
+                  }) as PipelineError
+              )
+            );
+            totalBytesWritten += bytesWritten;
+          })
+        ),
 
-    totalBytesWritten = allOutput.length;
-
-    // Write to file using Effect Platform
-    yield* fs.writeFile(outputPath, allOutput).pipe(
-      Effect.mapError(
-        (e) =>
-          new FileWriteError({
-            path: outputPath,
-            cause: e,
-          }) as PipelineError
-      )
+      // Release: Close the write stream (runs even on error)
+      (writeStream) => closeWriteStream(writeStream)
     );
 
     // Final progress update

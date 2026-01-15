@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 import { FileSystem } from "@effect/platform";
 import { JobStore } from "../services/job-store.service.js";
 import { canDownload, type DownloadOutput } from "../rules/download.rule.js";
-import { getContentType } from "../utils/file.utils.js";
+import { getContentType, extractFileName } from "../utils/file.utils.js";
 import { PlatformError } from "@effect/platform/Error";
 
 // ─────────────────────────────────────────────────────────────
@@ -87,29 +87,4 @@ export function handleGetFileinfo(
       },
     };
   });
-}
-
-// ─────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────
-function extractFileName(filePath: string): string {
-  const parts = filePath.split("/");
-  return parts[parts.length - 1] || "doenload";
-}
-
-const MIME_TYPES: Record<string, string> = {
-  ".txt": "text/plain",
-  ".json": "application/json",
-  ".csv": "text/csv",
-  ".gz": "application/gzip",
-  ".br": "application/x-brotli",
-  ".deflate": "application/x-deflate",
-};
-
-function generateContentType(fileName: string): string {
-  const lastDotIndex = fileName.lastIndexOf(".");
-  if (lastDotIndex === -1) return "application/octet-stream";
-
-  const extension = fileName.toLowerCase().slice(lastDotIndex);
-  return MIME_TYPES[extension] ?? "application/octet-stream";
 }

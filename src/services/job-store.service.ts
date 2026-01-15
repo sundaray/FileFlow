@@ -1,4 +1,4 @@
-import { Effect, Ref, Option } from "effect";
+import { Effect, Ref, Option, HashMap } from "effect";
 import type { Job } from "../types/job.types.js";
 
 // ─────────────────────────────────────────────────────────────
@@ -7,55 +7,45 @@ import type { Job } from "../types/job.types.js";
 
 export class JobStore extends Effect.Service<JobStore>()("JobStore", {
   effect: Effect.gen(function* () {
-    // store holds the Map of all jobs
-    const store = yield* Ref.make<Map<string, Job>>(new Map());
+    const store = yield* Ref.make<HashMap.HashMap<string, Job>>(
+      HashMap.empty()
+    );
 
     return {
       getAll: Ref.get(store).pipe(
-        Effect.map((jobs) => Array.from(jobs.values()))
+        Effect.map((jobs) => Array.from(HashMap.values(jobs)))
       ),
 
       get: (id: string) =>
-        Ref.get(store).pipe(
-          Effect.map((jobs) => Option.fromNullable(jobs.get(id)))
-        ),
+        Ref.get(store).pipe(Effect.map((jobs) => HashMap.get(jobs, id))),
 
       set: (job: Job) =>
-        Ref.update(store, (jobs) => {
-          const newJobs = new Map(jobs);
-          newJobs.set(job.id, job);
-          return newJobs;
-        }),
+        Ref.update(store, (jobs) => HashMap.set(jobs, job.id, job)),
 
-      update: (id: string, updates: Partial<Job>) => {
+      update: (id: string, updates: Partial<Job>) =>
         Ref.modify(store, (jobs) => {
-          const existing = jobs.get(id);
+          const existing = HashMap.get(jobs, id);
 
-          if (!existing) {
+          if (Option.isNone(existing)) {
             return [Option.none(), jobs];
           }
 
           const updated: Job = {
-            ...existing,
+            ...existing.value,
             ...updates,
             updatedAt: new Date(),
           };
 
-          const newJobs = new Map(jobs);
-          newJobs.set(id, updated);
-          return [Option.some(updated), newJobs];
-        });
-      },
+          return [Option.some(updated), HashMap.set(jobs, id, updated)];
+        }),
 
       remove: (id: string) =>
         Ref.modify(store, (jobs) => {
-          if (!jobs.has(id)) {
+          if (!HashMap.has(jobs, id)) {
             return [false, jobs];
           }
 
-          const newJobs = new Map(jobs);
-          newJobs.delete(id);
-          return [true, newJobs];
+          return [true, HashMap.remove(jobs, id)];
         }),
 
       isOperational: Effect.succeed(true),

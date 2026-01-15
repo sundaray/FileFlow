@@ -7,7 +7,7 @@ import {
 } from "../handlers/upload.handler.js";
 import { JobStore } from "../services/job-store.service.js";
 import { FileStream } from "../services/file-stream.service.js";
-import { PipelineProcessor } from "../services/pipeline-processor.service.js";
+import { PipelineProcessor } from "../services/pipeline/pipeline-processor-service.js";
 import type {
   UploadSuccess,
   UploadMissingFilenameError,
@@ -139,7 +139,7 @@ export function createUploadRoutes(
       Effect.gen(function* () {
         // Create job record
         const { job } = yield* handleCreateJob({
-          filename: validatedInput.filename,
+          fileName: validatedInput.fileName,
           pipelineConfig: validatedInput.pipelineConfig,
         });
 
