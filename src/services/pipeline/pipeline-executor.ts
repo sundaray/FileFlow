@@ -32,12 +32,15 @@ export interface PipelineResult {
  * 5. Apply byte transforms (compression)
  * 6. Write to output file
  */
-export function executePipeline(
+export function executePipeline<TReq>(
   inputPath: string,
   outputPath: string,
   stages: PipelineStages,
-  onProgress: (bytesRead: number, bytesWritten: number) => Effect.Effect<void>
-): Effect.Effect<PipelineResult, PipelineError, FileSystem.FileSystem> {
+  onProgress: (
+    bytesRead: number,
+    bytesWritten: number
+  ) => Effect.Effect<void, never, TReq>
+): Effect.Effect<PipelineResult, PipelineError, FileSystem.FileSystem | TReq> {
   return Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem;
 
