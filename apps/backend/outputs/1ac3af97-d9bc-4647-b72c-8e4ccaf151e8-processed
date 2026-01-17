@@ -1,0 +1,10 @@
+{"id":1,"name":"JOHN DOE","email":"JOHN@EXAMPLE.COM","phone":"555-123-4567","amount":150.5,"country":"USA"}
+{"id":2,"name":"JANE SMITH","email":"JANE@TEST.ORG","phone":"555-987-6543","amount":200,"country":"CANADA"}
+{"id":3,"name":"BOB WILSON","email":"BOB@COMPANY.COM","phone":"555-456-7890","amount":75.25,"country":"USA"}
+{"id":4,"name":"ALICE BROWN","email":"ALICE@EMAIL.NET","phone":"555-321-0987","amount":300,"country":"UK"}
+{"id":5,"name":"CHARLIE DAVIS","email":"CHARLIE@WEB.IO","phone":"555-654-3210","amount":50,"country":"GERMANY"}
+{"id":6,"name":"EVA MARTINEZ","email":"EVA@DOMAIN.COM","phone":"555-789-0123","amount":125.75,"country":"SPAIN"}
+{"id":7,"name":"FRANK JOHNSON","email":"FRANK@SITE.ORG","phone":"555-012-3456","amount":175,"country":"FRANCE"}
+{"id":8,"name":"GRACE LEE","email":"GRACE@MAIL.COM","phone":"555-234-5678","amount":225.5,"country":"JAPAN"}
+{"id":9,"name":"HENRY TAYLOR","email":"HENRY@INBOX.NET","phone":"555-345-6789","amount":90,"country":"AUSTRALIA"}
+{"id":10,"name":"IVY ANDERSON","email":"IVY@POST.IO","phone":"555-456-7891","amount":350,"country":"USA"}

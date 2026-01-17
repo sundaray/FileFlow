@@ -1,9 +1,6 @@
 import { Effect, Stream, Chunk, pipe } from "effect";
 import { parse as csvParse } from "csv-parse";
 import { CsvParseError, PipelineError } from "../errors.js";
-import { delimiter } from "path";
-import { collect } from "effect/Record";
-
 // ─────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────

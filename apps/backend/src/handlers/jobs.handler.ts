@@ -11,7 +11,6 @@ import {
   type CancelJobOutput,
 } from "../rules/jobs.rule.js";
 import type { JobStatus } from "../types/job.types.js";
-import { jobStore } from "../services/job-store.service.js";
 
 // ─────────────────────────────────────────────────────────────
 // Get Jobs Handler
