@@ -1,8 +1,11 @@
 node_modules/
 dist/
-uploads/*
-outputs/*
-!uploads/.gitkeep
-!outputs/.gitkeep
 .env
 *.log
+
+
+**/uploads/
+**/outputs/
+
+!**/uploads/.gitkeep
+!**/outputs/.gitkeep

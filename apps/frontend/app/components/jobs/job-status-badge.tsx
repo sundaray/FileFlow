@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { JobStatus } from "@/types";
+import type { JobStatus } from "@/app/types";
 
 interface JobStatusBadgeProps {
   status: JobStatus;
@@ -25,11 +25,7 @@ const statusConfig: Record<
     label: "Processing",
     className: "bg-blue-100 text-blue-700",
     icon: (
-      <svg
-        className="h-3 w-3 animate-spin"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
+      <svg className="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24">
         <circle
           className="opacity-25"
           cx="12"
@@ -57,11 +53,7 @@ const statusConfig: Record<
         stroke="currentColor"
         strokeWidth={3}
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M5 13l4 4L19 7"
-        />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
       </svg>
     ),
   },
@@ -113,7 +105,7 @@ export function JobStatusBadge({ status, size = "md" }: JobStatusBadgeProps) {
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full font-medium",
         config.className,
-        size === "sm" ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-sm"
+        size === "sm" ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-sm",
       )}
     >
       {config.icon}

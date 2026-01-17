@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { JobStatusBadge } from "@/components/jobs/job-status-badge";
+import { JobStatusBadge } from "@/app/components/jobs/job-status-badge";
 import { DownloadButton } from "./download-button";
-import { formatBytes, formatDuration, formatDate } from "@/lib/utils";
-import { getProgressUrl } from "@/lib/api";
-import type { ProgressEvent, JobStatus } from "@/types";
+import { formatBytes, formatDuration, formatDate } from "@/app/lib/utils";
+import { getProgressUrl } from "@/app/lib/api";
+import type { ProgressEvent, JobStatus } from "@/app/types";
 import { cn } from "@/lib/utils";
 
 interface JobProgressProps {
@@ -89,12 +89,17 @@ export function JobProgress({ jobId, initialStatus }: JobProgressProps) {
     return <JobProgressSkeleton />;
   }
 
-  const isTerminal = ["completed", "failed", "cancelled"].includes(progress.status);
+  const isTerminal = ["completed", "failed", "cancelled"].includes(
+    progress.status,
+  );
   const progressPercent = isTerminal
     ? 100
     : progress.totalStages > 0
-    ? Math.min(Math.round((progress.stageIndex / progress.totalStages) * 100), 99)
-    : 0;
+      ? Math.min(
+          Math.round((progress.stageIndex / progress.totalStages) * 100),
+          99,
+        )
+      : 0;
 
   return (
     <div className="space-y-6">
@@ -110,9 +115,7 @@ export function JobProgress({ jobId, initialStatus }: JobProgressProps) {
               {getStatusDescription(progress)}
             </p>
           </div>
-          {progress.status === "completed" && (
-            <DownloadButton jobId={jobId} />
-          )}
+          {progress.status === "completed" && <DownloadButton jobId={jobId} />}
         </div>
 
         {/* Progress Bar */}
@@ -242,7 +245,9 @@ export function JobProgress({ jobId, initialStatus }: JobProgressProps) {
           />
           <TimelineItem
             label="Completed"
-            value={progress.completedAt ? formatDate(progress.completedAt) : "—"}
+            value={
+              progress.completedAt ? formatDate(progress.completedAt) : "—"
+            }
             isActive={!!progress.completedAt}
           />
           {progress.startedAt && progress.completedAt && (
@@ -296,7 +301,7 @@ function TimelineItem({
       <span
         className={cn(
           "text-sm",
-          isActive ? "text-neutral-700" : "text-neutral-400"
+          isActive ? "text-neutral-700" : "text-neutral-400",
         )}
       >
         {label}
@@ -304,7 +309,7 @@ function TimelineItem({
       <span
         className={cn(
           "text-sm font-medium",
-          isActive ? "text-neutral-900" : "text-neutral-400"
+          isActive ? "text-neutral-900" : "text-neutral-400",
         )}
       >
         {value}

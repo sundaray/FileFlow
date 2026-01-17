@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { getDownloadUrl } from "@/lib/api";
+import { getDownloadUrl } from "@/app/lib/api";
 import { cn } from "@/lib/utils";
 
 interface DownloadButtonProps {
@@ -39,16 +39,12 @@ export function DownloadButton({ jobId, className }: DownloadButtonProps) {
         "bg-neutral-900 text-white hover:bg-neutral-800",
         "focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:ring-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        className
+        className,
       )}
     >
       {isDownloading ? (
         <>
-          <svg
-            className="h-4 w-4 animate-spin"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
+          <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle
               className="opacity-25"
               cx="12"

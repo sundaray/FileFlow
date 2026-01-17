@@ -4,6 +4,7 @@ import express, {
   type Express,
   type NextFunction,
 } from "express";
+import cors from "cors";
 import { makeAppRuntime } from "./runtime.js";
 import type { AppRuntime } from "./runtime.js";
 import { logger } from "./logger.js";
@@ -17,6 +18,21 @@ import { createUploadRoutes } from "./routes/upload.route.js";
 
 const app: Express = express();
 const runtime: AppRuntime = makeAppRuntime();
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Filename",
+    "X-Pipeline-Config",
+  ],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // Routes
 app.use("/api/health", createHealthRoutes(runtime));

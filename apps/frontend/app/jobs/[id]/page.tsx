@@ -2,7 +2,7 @@
 
 import { use } from "react";
 import Link from "next/link";
-import { JobProgress } from "@/components/job-detail";
+import { JobProgress } from "@/app/components/job-detail";
 
 interface JobDetailPageProps {
   params: Promise<{ id: string }>;

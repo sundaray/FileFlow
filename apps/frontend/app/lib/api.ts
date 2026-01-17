@@ -9,14 +9,13 @@ import type {
   UploadResponse,
   PipelineConfig,
   TextTransform,
-} from "@/types";
+} from "@/app/types";
 
 // ─────────────────────────────────────────────────────────────
 // Configuration
 // ─────────────────────────────────────────────────────────────
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 // ─────────────────────────────────────────────────────────────
 // Errors
@@ -44,7 +43,11 @@ function handleResponse<T>(response: Response): Effect.Effect<T, ApiError> {
   return Effect.gen(function* () {
     const data = yield* Effect.tryPromise({
       try: () => response.json(),
-      catch: () => new ApiError({ code: "PARSE_ERROR", message: "Failed to parse response" }),
+      catch: () =>
+        new ApiError({
+          code: "PARSE_ERROR",
+          message: "Failed to parse response",
+        }),
     });
 
     if (!response.ok || data.status === "error") {
@@ -53,7 +56,7 @@ function handleResponse<T>(response: Response): Effect.Effect<T, ApiError> {
           code: data.code ?? "UNKNOWN_ERROR",
           message: data.message ?? "An unknown error occurred",
           statusCode: response.status,
-        })
+        }),
       );
     }
 
@@ -65,7 +68,9 @@ function handleResponse<T>(response: Response): Effect.Effect<T, ApiError> {
 // Pipeline Builder
 // ─────────────────────────────────────────────────────────────
 
-export function buildPipelineConfig(textTransform: TextTransform): PipelineConfig {
+export function buildPipelineConfig(
+  textTransform: TextTransform,
+): PipelineConfig {
   return {
     stages: [
       {
@@ -87,8 +92,8 @@ export function buildPipelineConfig(textTransform: TextTransform): PipelineConfi
         },
       },
       {
-        id: "csv-stringify",
-        type: "csv-stringify",
+        id: "json-stringify",
+        type: "json-stringify",
         enabled: true,
         options: {},
       },
@@ -103,7 +108,10 @@ export function buildPipelineConfig(textTransform: TextTransform): PipelineConfi
 /**
  * Get all jobs
  */
-export function getJobs(): Effect.Effect<GetJobsResponse, ApiError | NetworkError> {
+export function getJobs(): Effect.Effect<
+  GetJobsResponse,
+  ApiError | NetworkError
+> {
   return Effect.gen(function* () {
     const response = yield* Effect.tryPromise({
       try: () => fetch(buildUrl("/api/jobs")),
@@ -117,7 +125,9 @@ export function getJobs(): Effect.Effect<GetJobsResponse, ApiError | NetworkErro
 /**
  * Get a single job by ID
  */
-export function getJob(jobId: string): Effect.Effect<GetJobResponse, ApiError | NetworkError> {
+export function getJob(
+  jobId: string,
+): Effect.Effect<GetJobResponse, ApiError | NetworkError> {
   return Effect.gen(function* () {
     const response = yield* Effect.tryPromise({
       try: () => fetch(buildUrl(`/api/jobs/${jobId}`)),
@@ -133,7 +143,7 @@ export function getJob(jobId: string): Effect.Effect<GetJobResponse, ApiError | 
  */
 export function uploadFile(
   file: File,
-  textTransform: TextTransform
+  textTransform: TextTransform,
 ): Effect.Effect<UploadResponse, ApiError | NetworkError> {
   return Effect.gen(function* () {
     const pipelineConfig = buildPipelineConfig(textTransform);
@@ -160,7 +170,9 @@ export function uploadFile(
 /**
  * Cancel a job
  */
-export function cancelJob(jobId: string): Effect.Effect<void, ApiError | NetworkError> {
+export function cancelJob(
+  jobId: string,
+): Effect.Effect<void, ApiError | NetworkError> {
   return Effect.gen(function* () {
     const response = yield* Effect.tryPromise({
       try: () =>
@@ -177,7 +189,9 @@ export function cancelJob(jobId: string): Effect.Effect<void, ApiError | Network
 /**
  * Delete a job
  */
-export function deleteJob(jobId: string): Effect.Effect<void, ApiError | NetworkError> {
+export function deleteJob(
+  jobId: string,
+): Effect.Effect<void, ApiError | NetworkError> {
   return Effect.gen(function* () {
     const response = yield* Effect.tryPromise({
       try: () =>
