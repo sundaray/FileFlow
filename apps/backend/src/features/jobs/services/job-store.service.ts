@@ -1,5 +1,5 @@
 import { Effect, Ref, Option, HashMap } from "effect";
-import type { Job } from "../types/job.types.js";
+import type { Job } from "../../../types/job.types.js";
 
 // ─────────────────────────────────────────────────────────────
 // The Service
@@ -8,12 +8,12 @@ import type { Job } from "../types/job.types.js";
 export class JobStore extends Effect.Service<JobStore>()("JobStore", {
   effect: Effect.gen(function* () {
     const store = yield* Ref.make<HashMap.HashMap<string, Job>>(
-      HashMap.empty()
+      HashMap.empty(),
     );
 
     return {
       getAll: Ref.get(store).pipe(
-        Effect.map((jobs) => Array.from(HashMap.values(jobs)))
+        Effect.map((jobs) => Array.from(HashMap.values(jobs))),
       ),
 
       get: (id: string) =>

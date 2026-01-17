@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 import { FileSystem } from "@effect/platform";
-import { JobStore } from "../services/job-store.service.js";
+import { JobStore } from "../features/jobs/services/job-store.service.js";
 import { canDownload, type DownloadOutput } from "../rules/download.rule.js";
 import { getContentType, extractFileName } from "../utils/file.utils.js";
 import { PlatformError } from "@effect/platform/Error";
@@ -18,7 +18,7 @@ export interface DownloadHandlerOutput {
 }
 
 export function handleDownload(
-  input: DownloadHandlerInput
+  input: DownloadHandlerInput,
 ): Effect.Effect<
   DownloadHandlerOutput,
   PlatformError,
@@ -66,7 +66,7 @@ export interface GetFileInfoHandlerOutput {
 }
 
 export function handleGetFileinfo(
-  input: GetFileInfoHandlerInput
+  input: GetFileInfoHandlerInput,
 ): Effect.Effect<
   GetFileInfoHandlerOutput,
   PlatformError,

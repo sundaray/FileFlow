@@ -6,7 +6,7 @@ import {
   handleDeleteJob,
   handleCancelJob,
 } from "../handlers/jobs.handler.js";
-import { JobStore } from "../services/job-store.service.js";
+import { JobStore } from "../features/jobs/services/job-store.service.js";
 import type {
   GetJobsSuccess,
   GetJobSuccess,
@@ -25,7 +25,7 @@ import type { AppRuntime } from "../runtime.js";
 // ─────────────────────────────────────────────────────────────
 
 export function createJobsRoutes(
-  runtime: AppRuntime
+  runtime: AppRuntime,
 ): ReturnType<typeof Router> {
   const router: ReturnType<typeof Router> = Router();
 
@@ -35,7 +35,7 @@ export function createJobsRoutes(
 
   function sendInternalServerError(
     res: Response,
-    cause: Cause.Cause<never>
+    cause: Cause.Cause<never>,
   ): void {
     console.error("Jobs Defect:\n" + Cause.pretty(cause));
     const response: InternalServerError = {
@@ -54,7 +54,7 @@ export function createJobsRoutes(
     const filterByStatus = isValidStatus(statusParam) ? statusParam : undefined;
 
     const exit = await Effect.runPromiseExit(
-      handleGetJobs({ filterByStatus }).pipe(Effect.provide(JobStore.Default))
+      handleGetJobs({ filterByStatus }).pipe(Effect.provide(JobStore.Default)),
     );
 
     Exit.match(exit, {
@@ -77,7 +77,7 @@ export function createJobsRoutes(
     const jobId = req.params.jobId as string;
 
     const exit = await Effect.runPromiseExit(
-      handleGetJob({ jobId }).pipe(Effect.provide(JobStore.Default))
+      handleGetJob({ jobId }).pipe(Effect.provide(JobStore.Default)),
     );
 
     Exit.match(exit, {
@@ -117,7 +117,7 @@ export function createJobsRoutes(
             res.status(200).json(response);
           }),
 
-          Match.exhaustive
+          Match.exhaustive,
         );
       },
     });
@@ -130,7 +130,7 @@ export function createJobsRoutes(
     const jobId = req.params.jobId as string;
 
     const exit = await Effect.runPromiseExit(
-      handleDeleteJob({ jobId }).pipe(Effect.provide(JobStore.Default))
+      handleDeleteJob({ jobId }).pipe(Effect.provide(JobStore.Default)),
     );
 
     Exit.match(exit, {
@@ -155,7 +155,7 @@ export function createJobsRoutes(
             res.status(200).json(response);
           }),
 
-          Match.exhaustive
+          Match.exhaustive,
         );
       },
     });
@@ -168,7 +168,7 @@ export function createJobsRoutes(
     const jobId = req.params.jobId as string;
 
     const exit = await Effect.runPromiseExit(
-      handleCancelJob({ jobId }).pipe(Effect.provide(JobStore.Default))
+      handleCancelJob({ jobId }).pipe(Effect.provide(JobStore.Default)),
     );
 
     Exit.match(exit, {
@@ -201,7 +201,7 @@ export function createJobsRoutes(
             res.status(200).json(response);
           }),
 
-          Match.exhaustive
+          Match.exhaustive,
         );
       },
     });
@@ -214,7 +214,7 @@ export function createJobsRoutes(
     return (
       value !== undefined &&
       ["pending", "processing", "completed", "failed", "cancelled"].includes(
-        value
+        value,
       )
     );
   }

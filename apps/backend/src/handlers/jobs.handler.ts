@@ -1,5 +1,5 @@
 import { Effect, Option } from "effect";
-import { JobStore } from "../services/job-store.service.js";
+import { JobStore } from "../features/jobs/services/job-store.service.js";
 import {
   getJobs,
   getJob,
@@ -24,7 +24,7 @@ export interface GetJobsHandlerOutput {
 }
 
 export function handleGetJobs(
-  input: GetJobsHandlerInput
+  input: GetJobsHandlerInput,
 ): Effect.Effect<GetJobsHandlerOutput, never, JobStore> {
   return Effect.gen(function* () {
     const jobs = yield* JobStore.getAll;
@@ -46,7 +46,7 @@ export interface GetJobHandlerOuput {
 }
 
 export function handleGetJob(
-  input: GetJobHandlerInput
+  input: GetJobHandlerInput,
 ): Effect.Effect<GetJobHandlerOuput, never, JobStore> {
   return Effect.gen(function* () {
     const mayBeJob = yield* JobStore.get(input.jobId);
@@ -69,7 +69,7 @@ export interface DeleteJobHandlerOutput {
 }
 
 export function handleDeleteJob(
-  input: DeleteJobHandlerInput
+  input: DeleteJobHandlerInput,
 ): Effect.Effect<DeleteJobHandlerOutput, never, JobStore> {
   return Effect.gen(function* () {
     const maybeJob = yield* JobStore.get(input.jobId);
@@ -96,7 +96,7 @@ export interface CancelJobHandlerOutput {
 }
 
 export function handleCancelJob(
-  input: CancelJobHandlerInput
+  input: CancelJobHandlerInput,
 ): Effect.Effect<CancelJobHandlerOutput, never, JobStore> {
   return Effect.gen(function* () {
     const maybeJob = yield* JobStore.get(input.jobId);

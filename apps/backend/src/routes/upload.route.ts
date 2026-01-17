@@ -5,7 +5,7 @@ import {
   handleValidateUpload,
   handleCreateJob,
 } from "../handlers/upload.handler.js";
-import { JobStore } from "../services/job-store.service.js";
+import { JobStore } from "../features/jobs/services/job-store.service.js";
 import { FileStream } from "../services/file-stream.service.js";
 import { PipelineProcessor } from "../services/pipeline/pipeline-processor-service.js";
 import type {
@@ -24,7 +24,7 @@ import type {
 // ─────────────────────────────────────────────────────────────
 
 export function createUploadRoutes(
-  runtime: AppRuntime
+  runtime: AppRuntime,
 ): ReturnType<typeof Router> {
   const router: ReturnType<typeof Router> = Router();
 
@@ -62,7 +62,7 @@ export function createUploadRoutes(
         fileName,
         pipelineConfigRaw,
         contentLength,
-      })
+      }),
     );
 
     // Handle validation result
@@ -127,7 +127,7 @@ export function createUploadRoutes(
 
           Match.tag("Success", (data) => data),
 
-          Match.exhaustive
+          Match.exhaustive,
         );
       },
     });
@@ -153,7 +153,7 @@ export function createUploadRoutes(
         yield* JobStore.update(job.id, { bytesRead: bytesWritten });
 
         return job;
-      })
+      }),
     );
 
     Exit.match(uploadExit, {
@@ -182,7 +182,7 @@ export function createUploadRoutes(
           .catch((error) => {
             console.error(
               `Background processing failed for job ${job.id}:`,
-              error
+              error,
             );
           });
       },

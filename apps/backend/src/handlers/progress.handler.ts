@@ -1,5 +1,5 @@
 import { Effect, Stream, Option, Queue, Schedule } from "effect";
-import { JobStore } from "../services/job-store.service.js";
+import { JobStore } from "../features/jobs/services/job-store.service.js";
 import { JobProgress } from "../services/job-progress.service.js";
 import {
   canSubscribe,
@@ -22,7 +22,7 @@ export interface ValidateSubscriptionHandlerOutput {
 }
 
 export function handleValidateSubscription(
-  input: ValidateSubscriptionHandlerInput
+  input: ValidateSubscriptionHandlerInput,
 ): Effect.Effect<ValidateSubscriptionHandlerOutput, never, JobStore> {
   return Effect.gen(function* () {
     const maybeJob = yield* JobStore.get(input.jobId);
@@ -41,14 +41,14 @@ export function handleValidateSubscription(
 export const keepAliveStream: Stream.Stream<"keepalive", never, never> =
   Stream.repeat(
     Stream.make("keepalive" as const),
-    Schedule.spaced("15 seconds")
+    Schedule.spaced("15 seconds"),
   );
 
 // ─────────────────────────────────────────────────────────────
 // Create Progress Stream Handler
 // ─────────────────────────────────────────────────────────────
 export function handleCreateProgressStream(
-  jobId: string
+  jobId: string,
 ): Effect.Effect<
   Stream.Stream<ProgressEvent, never, JobProgress>,
   never,
@@ -93,14 +93,14 @@ export function handleCreateProgressStream(
       // Send initial event, then stream from queue until final
       progressStream = Stream.concat(
         Stream.make(initialEvent),
-        Stream.takeUntil(queueStream, (event) => event.final === true)
+        Stream.takeUntil(queueStream, (event) => event.final === true),
       );
     }
 
     // Add cleanup when stream ends
     const streamWithCleanUp = Stream.ensuring(
       progressStream,
-      JobProgress.unsubscribe(jobId, queue)
+      JobProgress.unsubscribe(jobId, queue),
     );
 
     return streamWithCleanUp;

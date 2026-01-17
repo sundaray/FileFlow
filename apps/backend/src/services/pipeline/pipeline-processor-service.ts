@@ -1,5 +1,5 @@
 import { Effect, Option, Match } from "effect";
-import { JobStore } from "../job-store.service.js";
+import { JobStore } from "../../features/jobs/services/job-store.service.js";
 import { JobProgress } from "../job-progress.service.js";
 import { toProgressEvent } from "../../rules/progress.rule.js";
 import type { Job } from "../../types/job.types.js";
@@ -21,7 +21,7 @@ export class PipelineProcessor extends Effect.Service<PipelineProcessor>()(
       const updateAndPublish = (
         jobId: string,
         updates: Partial<Job>,
-        isFinal: boolean
+        isFinal: boolean,
       ) =>
         Effect.gen(function* () {
           yield* JobStore.update(jobId, updates);
@@ -49,7 +49,7 @@ export class PipelineProcessor extends Effect.Service<PipelineProcessor>()(
             completedAt: new Date(),
             error: formatPipelineError(error),
           },
-          true
+          true,
         );
 
       /**
@@ -58,7 +58,7 @@ export class PipelineProcessor extends Effect.Service<PipelineProcessor>()(
       const markJobAsCompleted = (
         jobId: string,
         bytesRead: number,
-        bytesWritten: number
+        bytesWritten: number,
       ) =>
         updateAndPublish(
           jobId,
@@ -68,7 +68,7 @@ export class PipelineProcessor extends Effect.Service<PipelineProcessor>()(
             bytesRead,
             bytesWritten,
           },
-          true
+          true,
         );
 
       /**
@@ -81,7 +81,7 @@ export class PipelineProcessor extends Effect.Service<PipelineProcessor>()(
             status: "processing",
             startedAt: new Date(),
           },
-          false
+          false,
         );
 
       return {
@@ -105,7 +105,7 @@ export class PipelineProcessor extends Effect.Service<PipelineProcessor>()(
 
             // Build pipeline stages
             const stages = yield* buildPipelineStages(job.pipelineConfig).pipe(
-              Effect.tapError((error) => markJobAsFailed(jobId, error))
+              Effect.tapError((error) => markJobAsFailed(jobId, error)),
             );
 
             // Progress callback
@@ -117,21 +117,21 @@ export class PipelineProcessor extends Effect.Service<PipelineProcessor>()(
               job.inputPath,
               job.outputPath,
               stages,
-              onProgress
+              onProgress,
             ).pipe(Effect.tapError((error) => markJobAsFailed(jobId, error)));
 
             // Mark as completed
             yield* markJobAsCompleted(
               jobId,
               result.bytesRead,
-              result.bytesWritten
+              result.bytesWritten,
             );
           }),
       };
     }),
     dependencies: [JobStore.Default, JobProgress.Default],
     accessors: true,
-  }
+  },
 ) {}
 
 // ─────────────────────────────────────────────────────────────
@@ -145,45 +145,45 @@ function formatPipelineError(error: PipelineError): string {
     Match.tag(
       "UnknownStageTypeError",
       ({ stageType, stageId }) =>
-        `Unknown stage type "${stageType}" for stage ${stageId}`
+        `Unknown stage type "${stageType}" for stage ${stageId}`,
     ),
 
     Match.tag(
       "PipelineExecutionError",
-      ({ cause }) => `Pipeline execution failed: ${String(cause)}`
+      ({ cause }) => `Pipeline execution failed: ${String(cause)}`,
     ),
 
     Match.tag(
       "InvalidFilterConfigError",
       ({ field, operator, message }) =>
-        `Invalid filter config (field: ${field}, operator: ${operator}): ${message}`
+        `Invalid filter config (field: ${field}, operator: ${operator}): ${message}`,
     ),
 
     Match.tag(
       "InvalidFieldsConfigError",
-      ({ message }) => `Invalid fields config: ${message}`
+      ({ message }) => `Invalid fields config: ${message}`,
     ),
 
     Match.tag(
       "UnsupportedCompressionAlgorithmError",
-      ({ algorithm }) => `Unsupported compression algorithm: ${algorithm}`
+      ({ algorithm }) => `Unsupported compression algorithm: ${algorithm}`,
     ),
 
     Match.tag(
       "CsvParseError",
-      ({ cause }) => `CSV parsing failed: ${String(cause)}`
+      ({ cause }) => `CSV parsing failed: ${String(cause)}`,
     ),
 
     Match.tag(
       "FileWriteError",
-      ({ path, cause }) => `Failed to write to ${path}: ${String(cause)}`
+      ({ path, cause }) => `Failed to write to ${path}: ${String(cause)}`,
     ),
 
     Match.tag(
       "StreamConversionError",
-      ({ cause }) => `Stream conversion error: ${String(cause)}`
+      ({ cause }) => `Stream conversion error: ${String(cause)}`,
     ),
 
-    Match.exhaustive
+    Match.exhaustive,
   );
 }

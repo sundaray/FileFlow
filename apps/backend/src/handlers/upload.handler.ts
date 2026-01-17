@@ -1,6 +1,6 @@
 import { Effect, Option } from "effect";
 import { randomUUID } from "node:crypto";
-import { JobStore } from "../services/job-store.service.js";
+import { JobStore } from "../features/jobs/services/job-store.service.js";
 import { Config } from "../services/config.service.js";
 import {
   validateUpload,
@@ -24,7 +24,7 @@ export interface ValidateUploadHandlerOutput {
 }
 
 export function handleValidateUpload(
-  input: ValidateUploadHandlerInput
+  input: ValidateUploadHandlerInput,
 ): Effect.Effect<ValidateUploadHandlerOutput, never, Config> {
   return Effect.gen(function* () {
     const config = yield* Config;
@@ -53,7 +53,7 @@ export interface CreateJobHandlerOutput {
 }
 
 export function handleCreateJob(
-  input: CreateJobHandlerInput
+  input: CreateJobHandlerInput,
 ): Effect.Effect<CreateJobHandlerOutput, never, JobStore | Config> {
   return Effect.gen(function* () {
     const config = yield* Config;
